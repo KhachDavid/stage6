@@ -545,7 +545,6 @@ void interp(NODE *n)
     }
 
     // make the call to QU_Delete
-
     if (attrname)
       errval = QU_Delete(n -> u.DELETE.relname,
 			 attrname,

@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.rmd": "markdown",
+        "*.r": "r",
+        "delete.C": "cpp",
+        "sort.C": "cpp",
+        "scanhelp.C": "cpp",
+        "print.C": "cpp",
+        "join.C": "cpp",
+        "catalog.C": "cpp",
+        "heapfile.C": "cpp"
+    }
+}
