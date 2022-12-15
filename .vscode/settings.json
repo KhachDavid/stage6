@@ -8,6 +8,7 @@
         "print.C": "cpp",
         "join.C": "cpp",
         "catalog.C": "cpp",
-        "heapfile.C": "cpp"
+        "heapfile.C": "cpp",
+        "insert.C": "cpp"
     }
 }

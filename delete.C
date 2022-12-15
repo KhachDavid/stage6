@@ -19,6 +19,9 @@ const Status QU_Delete(const string &relation,
 	// enum Datatype { STRING, INTEGER, FLOAT };    // attribute data types
 	// enum Operator { LT, LTE, EQ, GTE, GT, NE };  // scan operators
 
+	// print out the parameters
+	cout << "relation: " << relation << endl;
+
 	// map operator to enum Operator value where op is mapped by the array index
 	// Operator opMap[] = {LT, LTE, EQ, GTE, GT, NE};
 	// type is mapped by the array index
@@ -57,9 +60,6 @@ const Status QU_Delete(const string &relation,
 		return ATTRTYPEMISMATCH;
 	}
 
-	
-
-
 	// open the relation
 	HeapFileScan outerScan(relation, status);
 	if (status != OK)
@@ -85,7 +85,62 @@ const Status QU_Delete(const string &relation,
 	// delete the record that satisfies the comparison
 	while (outerScan.scanNext(outerRID) == OK)
 	{
-		status = outerScan.deleteRecord();
+
+		// get the record
+		Record outerRec;
+		status = outerScan.getRecord(outerRec);
+
+		// check if the record satisfies the comparison
+		// if the record satisfies the comparison, delete the record
+		if (status == OK)
+		{
+			// get the value of the attribute
+			char *value = (char *)outerRec.data + attrDesc.attrOffset;
+
+			// check if the value is null
+			if (value == NULL)
+			{
+				return ATTRTYPEMISMATCH;
+			}
+
+			// check if the value is the same as the value to be compared
+			switch (type)
+			{
+			case STRING:
+				if (strcmp(value, attrValue) == 0)
+				{
+					status = outerScan.deleteRecord();
+					if (status != OK)
+					{
+						return status;
+					}
+				}
+				break;
+			case INTEGER:
+				if (*(int *)value == *(int *)attrValue)
+				{
+					status = outerScan.deleteRecord();
+					if (status != OK)
+					{
+						return status;
+					}
+				}
+				break;
+			case FLOAT:
+				if (*(float *)value == *(float *)attrValue)
+				{
+					status = outerScan.deleteRecord();
+					if (status != OK)
+					{
+						return status;
+					}
+				}
+				break;
+			default:
+				return ATTRTYPEMISMATCH;
+			}
+		}
+
 		if (status != OK)
 		{
 			return status;
