@@ -74,14 +74,26 @@ const Status QU_Delete(const string &relation,
 								 attrValue,
 								 op);
 
-
-
 	if (status != OK)
 	{
 		return status;
 	}
 
-	status = outerScan.deleteRecord();
+	// delete the record that satisfies the comparison
+	RID outerRID;
+	Record outerRec;
+	while (outerScan.scanNext(outerRID) == OK)
+	{
+		status = outerScan.getRecord(outerRec);
+		ASSERT(status == OK);
+
+		// delete the record
+		status = outerScan.deleteRecord();
+		if (status != OK)
+		{
+			return status;
+		}
+	}
 
 	if (status != OK)
 	{
@@ -91,26 +103,26 @@ const Status QU_Delete(const string &relation,
 	// scan outer table
 
 	// delete the record that satisfies the comparison
-	//while (outerScan.scanNext(outerRID) == OK)
+	// while (outerScan.scanNext(outerRID) == OK)
 	//{
-//
+	//
 	//	// get the record
 	//	Record outerRec;
 	//	status = outerScan.getRecord(outerRec);
-//
+	//
 	//	// check if the record satisfies the comparison
 	//	// if the record satisfies the comparison, delete the record
 	//	if (status == OK)
 	//	{
 	//		// get the value of the attribute
 	//		char *value = (char *)outerRec.data + attrDesc.attrOffset;
-//
+	//
 	//		// check if the value is null
 	//		if (value == NULL)
 	//		{
 	//			return ATTRTYPEMISMATCH;
 	//		}
-//
+	//
 	//		// check if the value is the same as the value to be compared
 	//		switch (type)
 	//		{
@@ -151,7 +163,7 @@ const Status QU_Delete(const string &relation,
 	//			return ATTRTYPEMISMATCH;
 	//		}
 	//	}
-//
+	//
 	//	if (status != OK)
 	//	{
 	//		return status;
