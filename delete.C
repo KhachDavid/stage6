@@ -68,11 +68,20 @@ const Status QU_Delete(const string &relation,
 	}
 
 	// start scan on outer table
-	status = outerScan.startScan(0,
-								 0,
+	status = outerScan.startScan(attrDesc.attrOffset,
+								 attrDesc.attrLen,
 								 type,
-								 NULL,
+								 attrValue,
 								 op);
+
+
+
+	if (status != OK)
+	{
+		return status;
+	}
+
+	status = outerScan.deleteRecord();
 
 	if (status != OK)
 	{
@@ -80,72 +89,74 @@ const Status QU_Delete(const string &relation,
 	}
 
 	// scan outer table
-	RID outerRID;
 
 	// delete the record that satisfies the comparison
-	while (outerScan.scanNext(outerRID) == OK)
-	{
-
-		// get the record
-		Record outerRec;
-		status = outerScan.getRecord(outerRec);
-
-		// check if the record satisfies the comparison
-		// if the record satisfies the comparison, delete the record
-		if (status == OK)
-		{
-			// get the value of the attribute
-			char *value = (char *)outerRec.data + attrDesc.attrOffset;
-
-			// check if the value is null
-			if (value == NULL)
-			{
-				return ATTRTYPEMISMATCH;
-			}
-
-			// check if the value is the same as the value to be compared
-			switch (type)
-			{
-			case STRING:
-				if (strcmp(value, attrValue) == 0)
-				{
-					status = outerScan.deleteRecord();
-					if (status != OK)
-					{
-						return status;
-					}
-				}
-				break;
-			case INTEGER:
-				if (*(int *)value == *(int *)attrValue)
-				{
-					status = outerScan.deleteRecord();
-					if (status != OK)
-					{
-						return status;
-					}
-				}
-				break;
-			case FLOAT:
-				if (*(float *)value == *(float *)attrValue)
-				{
-					status = outerScan.deleteRecord();
-					if (status != OK)
-					{
-						return status;
-					}
-				}
-				break;
-			default:
-				return ATTRTYPEMISMATCH;
-			}
-		}
-
-		if (status != OK)
-		{
-			return status;
-		}
-	}
+	//while (outerScan.scanNext(outerRID) == OK)
+	//{
+//
+	//	// get the record
+	//	Record outerRec;
+	//	status = outerScan.getRecord(outerRec);
+//
+	//	// check if the record satisfies the comparison
+	//	// if the record satisfies the comparison, delete the record
+	//	if (status == OK)
+	//	{
+	//		// get the value of the attribute
+	//		char *value = (char *)outerRec.data + attrDesc.attrOffset;
+//
+	//		// check if the value is null
+	//		if (value == NULL)
+	//		{
+	//			return ATTRTYPEMISMATCH;
+	//		}
+//
+	//		// check if the value is the same as the value to be compared
+	//		switch (type)
+	//		{
+	//		case STRING:
+	//			if (strcmp(value, attrValue) == 0)
+	//			{
+	//				status = outerScan.deleteRecord();
+	//				if (status != OK)
+	//				{
+	//					return status;
+	//				}
+	//			}
+	//			break;
+	//		case INTEGER:
+	//			// print value and attrValue
+	//			cout << "value: " << *(int *)value << endl;
+	//			cout << "attrValue: " << *(int *)attrValue << endl;
+	//			if (*(int *)value == *(int *)attrValue)
+	//			{
+	//				status = outerScan.deleteRecord();
+	//				if (status != OK)
+	//				{
+	//					return status;
+	//				}
+	//			}
+	//			break;
+	//		case FLOAT:
+	//			if (*(float *)value == *(float *)attrValue)
+	//			{
+	//				status = outerScan.deleteRecord();
+	//				if (status != OK)
+	//				{
+	//					return status;
+	//				}
+	//			}
+	//			break;
+	//		default:
+	//			return ATTRTYPEMISMATCH;
+	//		}
+	//	}
+//
+	//	if (status != OK)
+	//	{
+	//		return status;
+	//	}
+	//}
 
 	return OK;
 }
